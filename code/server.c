@@ -17,14 +17,14 @@ Server* Init(char* inter, char* ip, char* serverName, char Dir[]){
 	sockaddr.sin_family = AF_INET;
 	sockaddr.sin_port = htons(S_PORT);
 	// Do this to get IP of inter, hate it!
-	struct ifreq ifr;
+	/*struct ifreq ifr;
 	ifr.ifr_addr.sa_family = AF_INET;
 	strncpy(ifr.ifr_name, inter, IFNAMSIZ-1);
 	ioctl(serv->Socket, SIOCGIFADDR, &ifr);
 	// set fd as nonblocking
-	fcntl(serv->Socket, F_SETFL, O_NONBLOCK, 1);
+	fcntl(serv->Socket, F_SETFL, O_NONBLOCK, 1);*/
 
-	sockaddr.sin_addr.s_addr = ((struct sockaddr_in*)&ifr.ifr_addr)->sin_addr.s_addr;
+	sockaddr.sin_addr.s_addr = getInterIP(serv->Socket, inter);
 
 	//serv->Clientlist.nClients = 0;
 	serv->IP = sockaddr.sin_addr.s_addr; // src IP
