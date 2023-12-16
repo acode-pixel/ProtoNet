@@ -6,7 +6,7 @@ TODO:
 notes:
 	use epoll to run caller without stopping program
 
-	uses Port: 5656
+	uses Port: 5657
 	how transfering files work:
 		client -> network : broadcasts a requested known file from the network
 		network : other connected clients re-broadcasts the message to other clients
@@ -48,8 +48,23 @@ challenges:
 	creating socket manager
 
 Server runtime loop:
+	listen for any new connections (update Server.nConn)
 	add any new sockets to a socket list
-	check the socket list if a socket has data to be read (using epoll)
+	check the socket list if a socket has data to be read (using epoll or kqueue)
 	use Socket manager to manage socket operations for each socket (if any)
 	print Sockets fds and their modes that are connected to the host
 
+Client runtime loop:
+	
+
+files:
+	client.c:
+		CL_Init(char* inter, char name[]);
+		connectToNetwork(char* IP, Client* cli);
+		makeFileReq(int fd, char* IP, char File[]);
+	server.c:
+		Init(char* inter, char* ip, char* serverName, char Dir[]);
+		delClient(int fd, Server* serv);
+		add_Client(int fd, Server* serv);
+		checkSockets(Serv* serv);
+		ServerListen(Server* serv);

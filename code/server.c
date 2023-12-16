@@ -4,6 +4,7 @@ Server* Init(char* inter, char* ip, char* serverName, char Dir[]){
 	// Check if Dir is NULL
 	assert(Dir != NULL);
 	if (access(Dir, R_OK) == -1){
+		perror("Direcotry Not Accessible:");
 		return NULL;
 	}
 	
