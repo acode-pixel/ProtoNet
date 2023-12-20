@@ -41,30 +41,9 @@ int main(int argc, char* argv[]){
 			if (fd > 0){
 				addClient(fd, test2);
 			}
-			checkSockets(test2);
-
-			/*printf("\n%i", test2->Socket);
-			printf("\n%i", fd);
-
-			if (fd <= 0){
-				continue;
-			}
-			
-			struct in_addr addr;
-		
-			Packet* buf = (Packet*) malloc(sizeof(Packet));
-			if (read(fd, buf, sizeof(*buf)) == -1){
-				perror("read failed:");
-				exit(errno);
-			}
-			printf("\nProtocol: %s", buf->Proto);
-			printf("\nDatalen: %i", buf->datalen);
-			printf("\nMode: %x", *buf->Mode);
-			addr.s_addr = buf->IP;
-			printf("\nDst IP: %s", inet_ntoa(addr));
-			read(fd, buf->data, buf->datalen);
-			printf("\n%s", ((struct BROD*)buf->data)->fileReq);
-			//close(fd);	*/
+			int fds[MAX_EVENTS];
+			checkSockets(test2, fds);
+			SocketManager(fds, test2);
 		}
 	}
 	return 0;

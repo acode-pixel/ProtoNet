@@ -47,6 +47,11 @@ args:
 challenges:
 	creating socket manager
 
+Socket Manager functions:
+	iterate over socket lists
+	
+
+
 Server runtime loop:
 	listen for any new connections (update Server.nConn)
 	add any new sockets to a socket list

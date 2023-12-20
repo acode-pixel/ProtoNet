@@ -17,13 +17,9 @@ Server* Init(char* inter, char* ip, char* serverName, char Dir[]){
 	struct sockaddr_in sockaddr;
 	sockaddr.sin_family = AF_INET;
 	sockaddr.sin_port = htons(S_PORT);
-	// Do this to get IP of inter, hate it!
-	/*struct ifreq ifr;
-	ifr.ifr_addr.sa_family = AF_INET;
-	strncpy(ifr.ifr_name, inter, IFNAMSIZ-1);
-	ioctl(serv->Socket, SIOCGIFADDR, &ifr);
+
 	// set fd as nonblocking
-	fcntl(serv->Socket, F_SETFL, O_NONBLOCK, 1);*/
+	fcntl(serv->Socket, F_SETFL, O_NONBLOCK, 1);
 
 	sockaddr.sin_addr.s_addr = getInterIP(serv->Socket, inter);
 
@@ -101,42 +97,55 @@ int addClient(int fd, Server* serv){
 	return -1;
 }
 
-int checkSockets(Server* serv){
+int checkSockets(Server* serv, int fds[]){
 	struct timespec ts;
 	ts.tv_sec = 1;
        	ts.tv_nsec = 5000000;
 	int nevents = kevent(serv->kqueueInstance, NULL, 0, serv->Events, 10, &ts);
+
 	printf("\n%i", nevents);
 	if (nevents == 0){
 		return 0;
 	}
 
-	for (int i = 0; i < MAX_EVENTS; i++){
+	int index = 0;
 
-		if (serv->Events[i].filter == EVFILT_READ && serv->Events[i].flags != EV_EOF){
-			printf("\n%s", serv->Events[i].udata);
-			printf("\nreading fd: %lu", serv->Events[i].ident);
-			Packet* buf = (Packet*) malloc(sizeof(Packet));
-			if (recv(serv->Events[i].ident, buf, sizeof(*buf), 0) == -1){
-				perror("read Failed:");
-				return errno;
-			}
-
-			struct in_addr addr;
-
-			printf("\nProtocol: %s", buf->Proto);
-			printf("\nDatalen: %i", buf->datalen);
-			printf("\nMode: %x", *buf->Mode);
-			addr.s_addr = buf->IP;
-			printf("\nDst IP: %s", inet_ntoa(addr));
-			read(serv->Events[i].ident, buf->data, buf->datalen);
-			printf("\n%s", ((struct BROD*)buf->data)->fileReq);
-
-			delClient(serv->Events[i].ident, serv);
-			close(serv->Events[i].ident);
-
-		
+	for (int l = 0; l < MAX_EVENTS; l++){
+		if (serv->Events[l].filter == EVFILT_READ && serv->Events[l].flags != EV_EOF){
+		fds[index] = serv->Events[l].ident;
+		index++;		
 		}
+	}
+
+	return 0;
+}
+
+int SocketManager(int fds[], Server* serv){
+
+	for (int i = 0; i < sizeof(*fds)/sizeof(fds[0]); i++){
+
+		Packet* buf = (Packet*) malloc(sizeof(Packet));
+		if (fds[i] == 0){
+			return 0;
+		}
+		
+		readPck(fds[i], buf);
+
+		struct in_addr addr;
+
+		printf("\nProtocol: %s", buf->Proto);
+		printf("\nDatalen: %i", buf->datalen);
+		printf("\nMode: %x", *buf->Mode);
+		addr.s_addr = buf->IP;
+		printf("\nDst IP: %s", inet_ntoa(addr));
+		read(serv->Events[i].ident, buf->data, buf->datalen);
+		printf("\n%s", ((struct BROD*)buf->data)->fileReq);
+
+		delClient(serv->Events[i].ident, serv);
+		close(serv->Events[i].ident);
+		free(buf);
+		fds[i] = 0;
+
 	}
 
 	return 0;

@@ -45,3 +45,13 @@ int sendPck(int fd, uint32_t IP, int Mode, void* data){
 	free(pck);
 	return 0;
 }
+
+int readPck(int fd, Packet* buf){
+	printf("\nreading fd: %lu", fd);
+
+	if (recv(fd, buf, sizeof(*buf), 0) == -1){
+		perror("read Failed:");
+		return errno;
+	}	
+	return 0;
+} 
