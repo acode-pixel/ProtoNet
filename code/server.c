@@ -10,6 +10,7 @@ Server* Init(char* inter, char* ip, char* serverName, char Dir[]){
 	
 	// alloc server 
 	Server* serv = (Server*) malloc(sizeof(Server) + strlen(Dir));
+	memset(serv, 0, sizeof(Server) + strlen(Dir));
 	serv->ServerOpts.socketOpt.keepalive = 1;
 	serv->ServerOpts.socketOpt.reuseaddr = 1;
 	serv->Socket = socket(AF_INET, SOCK_STREAM, 0);
@@ -50,7 +51,7 @@ Server* Init(char* inter, char* ip, char* serverName, char Dir[]){
 	serv->lkqueueInstance = kqueue();
 
 	struct kevent ev;
-	EV_SET(&ev, serv->Socket, EVFILT_READ, EV_ADD | EV_ENABLE | EV_CLEAR, 0, 0, "LISTEN");
+	EV_SET(&ev, serv->Socket, EVFILT_READ, EV_ADD | EV_ENABLE, 0, 0, "LISTEN");
 	kevent(serv->lkqueueInstance, &ev, 1, NULL, 0, NULL);
 	return serv;
 }
@@ -87,6 +88,7 @@ int addClient(int fd, Server* serv){
 		else if (serv->Clientlist.clients[i].Socket == 0){
 			serv->Clientlist.clients[i].Socket = fd;
 			serv->nConn += 1;
+			serv->Clientlist.clients[i].socketMode = 0;
 			EV_SET(&ev, fd, EVFILT_READ, EV_ADD | EV_ENABLE | EV_CLEAR, 0, 0, NULL);
 			kevent(serv->kqueueInstance, &ev, 1, NULL, 0, NULL);
 			printf("\nAdded %i to kqueue", fd);
@@ -95,6 +97,24 @@ int addClient(int fd, Server* serv){
 	}
 
 	return -1;
+}
+
+Client* getClient(clientList* Clientlist, int fd, char* name){
+	if (fd != 0){
+		for (int i = 0; i < MAX_CLIENTS; i++){
+			if (Clientlist->clients[i].Socket == fd){
+				return &Clientlist->clients[i];
+			}
+		}
+	} else if(name != NULL){
+		for (int i = 0; i < MAX_CLIENTS; i++){
+			if (strcmp(Clientlist->clients[i].name, name) == 0){
+				return &Clientlist->clients[i];
+			}
+		}
+	}
+
+	return (Client*)NULL;
 }
 
 int checkSockets(Server* serv, int fds[]){
@@ -122,28 +142,28 @@ int checkSockets(Server* serv, int fds[]){
 
 int SocketManager(int fds[], Server* serv){
 
+	Packet* buf = NULL;
+	buf = (Packet*) malloc(sizeof(Packet));
+
 	for (int i = 0; i < sizeof(*fds)/sizeof(fds[0]); i++){
 
-		Packet* buf = (Packet*) malloc(sizeof(Packet));
 		if (fds[i] == 0){
+			free(buf);
 			return 0;
 		}
 		
-		readPck(fds[i], buf);
+		if (readPck(fds[i], buf) == 0){
 
-		struct in_addr addr;
+			if (buf->Mode == 1){
+				printf("\nParsing Packet");
+				brodParser(buf, getClient(&serv->Clientlist, fds[i], NULL), serv);
+			}
 
-		printf("\nProtocol: %s", buf->Proto);
-		printf("\nDatalen: %i", buf->datalen);
-		printf("\nMode: %x", *buf->Mode);
-		addr.s_addr = buf->IP;
-		printf("\nDst IP: %s", inet_ntoa(addr));
-		read(serv->Events[i].ident, buf->data, buf->datalen);
-		printf("\n%s", ((struct BROD*)buf->data)->fileReq);
+		}
 
 		delClient(serv->Events[i].ident, serv);
 		close(serv->Events[i].ident);
-		free(buf);
+		memset(buf, 0, sizeof(Packet) + buf->datalen);
 		fds[i] = 0;
 
 	}
@@ -167,4 +187,20 @@ int ServerListen(Server* serv){
 	}
 	return 0;
 
+}
+
+int brodParser(Packet* buf, Client* client, Server* serv){
+	char* fileReq = ((struct BROD*)buf->data)->fileReq;
+	char filepath[strlen(serv->dir)+strlen(fileReq)];
+	strcpy(filepath, serv->dir);
+	strcat(filepath, fileReq);
+	printf("\nChecking file %s", filepath);
+
+	if(access(filepath, R_OK) == -1){
+		char* data = "NO_FILE";
+		sendPck(client->Socket, buf->IP, 1, data);
+	}
+
+	client->socketMode = 1;
+	return 0;
 }

@@ -23,22 +23,25 @@ uint32_t getInterIP(int fd,char inter[]){
 	return ((struct sockaddr_in*)&ifr.ifr_addr)->sin_addr.s_addr;
 }
 
-int sendPck(int fd, uint32_t IP, int Mode, void* data){
-	Packet* pck = (Packet*) malloc(sizeof(Packet) + strlen(data)+1);
+int sendPck(int fd, uint32_t IP, uint8_t Mode, void* data){
+	Packet* pck = NULL;
+	pck = (Packet*) malloc(sizeof(Packet) + strlen(data));
+	memset(pck, 0, sizeof(Packet) + strlen(data));
 	memcpy(pck->Proto, "SPTP", 4);
 	memcpy(&pck->IP, &IP, sizeof(IP));
-	memcpy(pck->Mode, (char*)&Mode, 1);
+	pck->Mode = Mode;
 	if (strlen(data) > 1024){
 		errno = 84;
 		perror("Pck creation error");
 		free(pck);
 		return -1;
 	}
-	memcpy(pck->data, data, strlen(data)+1);
-	pck->datalen = strlen(data);
+	memcpy(pck->data, data, strlen(data));
+	pck->datalen = strlen(data)+1;
 
 	if (send(fd, pck, sizeof(*pck) + strlen(data)+1, 0) == -1){
 		perror("Falied to send Pck");
+		free(pck);
 		return -1;
 	}
 
@@ -47,11 +50,20 @@ int sendPck(int fd, uint32_t IP, int Mode, void* data){
 }
 
 int readPck(int fd, Packet* buf){
-	printf("\nreading fd: %lu", fd);
+	printf("\nreading fd: %d", fd);
 
 	if (recv(fd, buf, sizeof(*buf), 0) == -1){
 		perror("read Failed:");
 		return errno;
-	}	
+	}
+
+	if (strlen(buf->Proto) == 0){
+		return -1;
+	}
+
+	Packet* buf2 = realloc(buf, sizeof(Packet)+buf->datalen);
+	read(fd, buf2->data, buf->datalen);
+	buf = buf2;
+
 	return 0;
 } 

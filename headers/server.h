@@ -40,9 +40,12 @@ typedef struct Server {
 
 Server* Init(char* inter, char* ip, char* serverName, char Dir[]);
 int addClient(int fd, Server* serv);
+Client* getClient(clientList* Clientlist, int fd, char* name);
 int checkSockets(Server* serv, int fds[]);
 int SocketManager(int fds[], Server* serv);
 int ServerListen(Server* serv);
+int brodParser(Packet* buf, Client* client, Server* serv);
+
 
 
 #endif

@@ -33,7 +33,7 @@ int connectToNetwork(char* IP, Client* cli){
 }
 
 int makeFileReq(int fd, char* IP, char File[]){
-	struct BROD* br = (struct BROD*)malloc(sizeof(struct BROD) + strlen(File));
+	struct BROD* br = (struct BROD*)malloc(sizeof(struct BROD) + strlen(File)+1);
 	br->hops = 0x01;
 	strcpy(br->fileReq, File);
 	assert(sendPck(fd, inet_addr(IP), 1, br) == 0);

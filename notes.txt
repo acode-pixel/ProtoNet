@@ -13,6 +13,7 @@ notes:
 		network -> server : Server module detects a request from the network that has the available file
 		server -> network : Server tries to retrace the path of the original request through the network to give transaction ID (computers between the path log the transaction ID for further use)
 		network -> client : Client receives a transaction ID for file sharing.
+		client -> network -> server : client sends an OK message to the server.
 		client -> network -> server : bothe client and server now have a route in which data can be sent and received from one another (with the help of transaction IDs to guide the data)
 		server -> network -> client : server sends an EOF message to the client through the server
 		client -> network -> server : client sneds a request to destroy the path to the server
@@ -26,13 +27,17 @@ notes:
 packet Format:
 	0 - 3: SPTP
 	4: Mode: (01)BROD, (02)TRAC, (03)DATA
-	5 - 8: Dest: (IP or any other Identifier)
-	8 - 1024: Relevant Data
+	5 - 8: Dest: (Identifier of file requester)
+	9 - 1024: Relevant Data
 
 	Modes:
 		BROD:
-			8 : hops between client and server
-			9 - 1024 : File client requested 
+			9 : hops between client and server
+			10 - 1024 : File client requested or message
+		TRAC:
+			9 : transaction ID
+			10 - 13 : Identifier of sender
+			14 : lifetime of trac ID per server loop (for redundancy)
 
 Socket Modes:
 	BROD - Socket is used for BROD packets
@@ -48,8 +53,26 @@ challenges:
 	creating socket manager
 
 Socket Manager functions:
-	iterate over socket lists
-	
+	read over sockets
+	if server role:
+		add any new clients that is requesting for a file to a Clients list with associated socket mode
+		iterate over clients and do associated modes form said clients
+
+		if BROD:
+			Check if file is available on the server folder
+			if available:
+				send a TRAC packet to every connected socket with a UID
+				update socket modes
+			if not available:
+				send a broadcast message NO_FILE with filename to the client
+
+		if BROD with EOP:
+			send an BROD.OK message to client
+			remove client from client list
+
+				
+		
+		
 
 
 Server runtime loop:

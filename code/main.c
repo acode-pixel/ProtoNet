@@ -37,11 +37,12 @@ int main(int argc, char* argv[]){
 		while (true){
 			int fd = ServerListen(test2);
 			printf("\nfd: %i", fd);
-			printf("\nnConn: %i", test2->nConn);
+			printf("\nnConn: %u", test2->nConn);
 			if (fd > 0){
 				addClient(fd, test2);
 			}
 			int fds[MAX_EVENTS];
+
 			checkSockets(test2, fds);
 			SocketManager(fds, test2);
 		}

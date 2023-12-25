@@ -15,6 +15,10 @@
 #include <assert.h>
 #include <unistd.h>
 
+#define SPTP_BROD 1
+#define SPTP_TRAC 2
+#define SPTP_DATA 3
+
 struct BROD {
 	uint8_t hops;
 	char fileReq[];
@@ -23,7 +27,7 @@ struct BROD {
 typedef struct Packet {
 	char Proto[4];
 	uint32_t IP;
-	char Mode[1];
+	uint8_t Mode;
 	uint32_t datalen;
 
 	uint8_t data[]; /* MAX 1024 */
@@ -37,7 +41,7 @@ typedef struct SocketOpt {
 
 int setSockOpts(int sock, SocketOpt* so, char opts[]);
 uint32_t getInterIP(int fd,char inter[]);
-int sendPck(int fd, uint32_t IP, int Mode, void* data);
+int sendPck(int fd, uint32_t IP, uint8_t Mode, void* data);
 int readPck(int fd, Packet* buf);
 
 #endif
