@@ -22,6 +22,7 @@ int main(int argc, char* argv[]){
 
 		makeFileReq(test1->Socket, argv[4], argv[5]);
 		close(test1->Socket);
+		free(test1);
 
 		return 0;
 	}
@@ -46,6 +47,7 @@ int main(int argc, char* argv[]){
 			checkSockets(test2, fds);
 			SocketManager(fds, test2);
 		}
+		free(test2);
 	}
 	return 0;
 }

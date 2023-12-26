@@ -61,9 +61,8 @@ int readPck(int fd, Packet* buf){
 		return -1;
 	}
 
-	Packet* buf2 = realloc(buf, sizeof(Packet)+buf->datalen);
-	read(fd, buf2->data, buf->datalen);
-	buf = buf2;
+	buf = realloc(buf, sizeof(Packet)+buf->datalen);
+	read(fd, buf->data, buf->datalen);
 
 	return 0;
 } 

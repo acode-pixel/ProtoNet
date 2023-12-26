@@ -144,8 +144,9 @@ int SocketManager(int fds[], Server* serv){
 
 	Packet* buf = NULL;
 	buf = (Packet*) malloc(sizeof(Packet));
+	memset(buf, 0, sizeof(Packet));
 
-	for (int i = 0; i < sizeof(*fds)/sizeof(fds[0]); i++){
+	for (int i = 0; i <= sizeof(*fds)/sizeof(fds[0]); i++){
 
 		if (fds[i] == 0){
 			free(buf);
@@ -163,7 +164,6 @@ int SocketManager(int fds[], Server* serv){
 
 		delClient(serv->Events[i].ident, serv);
 		close(serv->Events[i].ident);
-		memset(buf, 0, sizeof(Packet) + buf->datalen);
 		fds[i] = 0;
 
 	}
