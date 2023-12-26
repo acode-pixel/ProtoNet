@@ -30,6 +30,15 @@ struct TRAC {
 	uint8_t lifetime;
 };
 
+typedef struct tracItem {
+	uint tracID;
+	uint8_t hops;
+	uint8_t lifetime;
+	void* fileOffset;
+	char fileReq[];
+
+} tracItem;
+
 typedef struct Packet {
 	char Proto[4];
 	char Name[12];

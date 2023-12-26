@@ -83,6 +83,7 @@ Server runtime loop:
 	print Sockets fds and their modes that are connected to the host
 
 Client runtime loop:
+	send a BROD packet to server
 	
 
 files:

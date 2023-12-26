@@ -189,23 +189,42 @@ int ServerListen(Server* serv){
 
 }
 
+int addTracItem(tracList* Traclist, uint tracID, uint8_t hops, uint8_t lifetime, void* fileOffset, char* fileReq){
+	for (int i = 0; i < MAX_CLIENTS; i++){
+		if (Traclist->tracs[i].tracID != 0){
+			continue;
+		}
+
+		Traclist->tracs[i].tracID = tracID;
+		Traclist->tracs[i].hops = hops;
+		Traclist->tracs[i].lifetime = lifetime;
+		Traclist->tracs[i].fileOffset = fileOffset;
+		strcpy(Traclist->tracs[i].fileReq, fileReq);
+		return 0;
+	}
+
+	printf("\nMaximum transactions reached");
+	return -1;
+}
+
 int tracSpread(clientList* Clientlist, Packet* buf, Server* serv){
 	struct TRAC* trac = (struct TRAC*) malloc(sizeof(struct TRAC));
 	trac->hops = ((struct BROD*)buf->data)->hops;
-	trac->lifetime = 0;
+	trac->lifetime = 255-trac->hops;
+	srand(time(NULL));
+	trac->tracID = rand();
 
 	for (int i = 0; i < MAX_CLIENTS; i++){
 		if (Clientlist->clients[i].Socket == 0){
-			free(trac);
-			return 0;
+			continue;
 		}
-
-		srand(time(NULL));
-		trac->tracID = rand();
 
 		sendPck(Clientlist->clients[i].Socket, serv->serverName, SPTP_TRAC, trac);
 
 	}
+
+	free(trac);
+	addTracItem(&serv->Traclist, trac->tracID, trac->hops, trac->lifetime, NULL, ((struct BROD*)buf->data)->fileReq);
 
 	return 0;
 }
@@ -217,14 +236,12 @@ int brodParser(Packet* buf, Client* client, Server* serv){
 	strcat(filepath, fileReq);
 	printf("\nChecking file %s", filepath);
 
-	client->socketMode = 1;
-
 	if(access(filepath, R_OK) == -1){
 		char* data = "NO_FILE";
 		sendPck(client->Socket, buf->Name, 1, data);
 		return 0;
 	} else {
-		client->socketMode = 1;
+		client->socketMode = SPTP_BROD;
 		tracSpread(&serv->Clientlist, buf, serv);
 	}
 	return 0;

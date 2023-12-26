@@ -46,6 +46,7 @@ int main(int argc, char* argv[]){
 
 			checkSockets(test2, fds);
 			SocketManager(fds, test2);
+			//IdManager();
 		}
 		free(test2);
 	}

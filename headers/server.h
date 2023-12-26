@@ -22,6 +22,10 @@ typedef struct clientList {
 	Client clients[MAX_CLIENTS];
 } clientList;
 
+typedef struct tracList {
+	tracItem tracs[MAX_CLIENTS];
+} tracList;
+
 typedef struct Server {
 	int Socket;		/* Socket */
 	int kqueueInstance;
@@ -33,9 +37,9 @@ typedef struct Server {
 	char serverName[12];	/* Server Name */ 
 	serverOpts ServerOpts;	/* Server Options */
 	struct kevent Events[MAX_CLIENTS];
-	struct TRAC tracs [MAX_CLIENTS];
 	Client client;		/* for client-server hybrid */
 	clientList Clientlist;
+	tracList Traclist;
 	char dir[];	/* Server Dir */
 } Server;
 
