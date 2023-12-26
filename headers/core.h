@@ -24,9 +24,15 @@ struct BROD {
 	char fileReq[];
 };
 
+struct TRAC {
+	uint tracID;
+	uint8_t hops;
+	uint8_t lifetime;
+};
+
 typedef struct Packet {
 	char Proto[4];
-	uint32_t IP;
+	char Name[12];
 	uint8_t Mode;
 	uint32_t datalen;
 
@@ -41,7 +47,7 @@ typedef struct SocketOpt {
 
 int setSockOpts(int sock, SocketOpt* so, char opts[]);
 uint32_t getInterIP(int fd,char inter[]);
-int sendPck(int fd, uint32_t IP, uint8_t Mode, void* data);
+int sendPck(int fd, char *Name, uint8_t Mode, void* data);
 int readPck(int fd, Packet* buf);
 
 #endif

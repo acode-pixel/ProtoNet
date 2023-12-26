@@ -27,7 +27,7 @@ notes:
 packet Format:
 	0 - 3: SPTP
 	4: Mode: (01)BROD, (02)TRAC, (03)DATA
-	5 - 8: Dest: (Identifier of file requester)
+	5 - 8: Ident: (Identifier of file requester)
 	9 - 1024: Relevant Data
 
 	Modes:
@@ -36,8 +36,8 @@ packet Format:
 			10 - 1024 : File client requested or message
 		TRAC:
 			9 : transaction ID
-			10 - 13 : Identifier of sender
-			14 : lifetime of trac ID per server loop (for redundancy)
+			10 : hops between client and server from BROD packet
+			10 : lifetime of trac ID per server loop (for redundancy)
 
 Socket Modes:
 	BROD - Socket is used for BROD packets

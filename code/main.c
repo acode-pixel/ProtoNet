@@ -20,7 +20,7 @@ int main(int argc, char* argv[]){
 			perror("Failed to connect to client");
 		}
 
-		makeFileReq(test1->Socket, argv[4], argv[5]);
+		makeFileReq(test1->Socket, test1->name, argv[5]);
 		close(test1->Socket);
 		free(test1);
 

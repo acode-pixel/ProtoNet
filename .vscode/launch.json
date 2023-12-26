@@ -5,7 +5,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceRoot}/a.out",
-            "args": ["client", "lo0", "", "127.0.0.1", "a.out"],
+            "args": ["client", "lo0", "bob", "127.0.0.1", "a.out"],
             "stopAtEntry": false,
             "cwd": "${workspaceRoot}",
             "environment": [],

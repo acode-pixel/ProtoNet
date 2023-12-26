@@ -189,6 +189,27 @@ int ServerListen(Server* serv){
 
 }
 
+int tracSpread(clientList* Clientlist, Packet* buf, Server* serv){
+	struct TRAC* trac = (struct TRAC*) malloc(sizeof(struct TRAC));
+	trac->hops = ((struct BROD*)buf->data)->hops;
+	trac->lifetime = 0;
+
+	for (int i = 0; i < MAX_CLIENTS; i++){
+		if (Clientlist->clients[i].Socket == 0){
+			free(trac);
+			return 0;
+		}
+
+		srand(time(NULL));
+		trac->tracID = rand();
+
+		sendPck(Clientlist->clients[i].Socket, serv->serverName, SPTP_TRAC, trac);
+
+	}
+
+	return 0;
+}
+
 int brodParser(Packet* buf, Client* client, Server* serv){
 	char* fileReq = ((struct BROD*)buf->data)->fileReq;
 	char filepath[strlen(serv->dir)+strlen(fileReq)];
@@ -196,11 +217,15 @@ int brodParser(Packet* buf, Client* client, Server* serv){
 	strcat(filepath, fileReq);
 	printf("\nChecking file %s", filepath);
 
+	client->socketMode = 1;
+
 	if(access(filepath, R_OK) == -1){
 		char* data = "NO_FILE";
-		sendPck(client->Socket, buf->IP, 1, data);
+		sendPck(client->Socket, buf->Name, 1, data);
+		return 0;
+	} else {
+		client->socketMode = 1;
+		tracSpread(&serv->Clientlist, buf, serv);
 	}
-
-	client->socketMode = 1;
 	return 0;
 }

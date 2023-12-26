@@ -33,6 +33,7 @@ typedef struct Server {
 	char serverName[12];	/* Server Name */ 
 	serverOpts ServerOpts;	/* Server Options */
 	struct kevent Events[MAX_CLIENTS];
+	struct TRAC tracs [MAX_CLIENTS];
 	Client client;		/* for client-server hybrid */
 	clientList Clientlist;
 	char dir[];	/* Server Dir */
@@ -44,6 +45,7 @@ Client* getClient(clientList* Clientlist, int fd, char* name);
 int checkSockets(Server* serv, int fds[]);
 int SocketManager(int fds[], Server* serv);
 int ServerListen(Server* serv);
+int tracSpread(clientList* Clientlist, Packet* buf, Server* serv);
 int brodParser(Packet* buf, Client* client, Server* serv);
 
 
