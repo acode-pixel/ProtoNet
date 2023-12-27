@@ -43,14 +43,14 @@ typedef struct Server {
 	char dir[];	/* Server Dir */
 } Server;
 
+#include "serverModules/clientModule.h"
+#include "serverModules/parserModules.h"
+#include "serverModules/tracModule.h"
+
 Server* Init(char* inter, char* ip, char* serverName, char Dir[]);
-int addClient(int fd, Server* serv);
-Client* getClient(clientList* Clientlist, int fd, char* name);
 int checkSockets(Server* serv, int fds[]);
 int SocketManager(int fds[], Server* serv);
 int ServerListen(Server* serv);
-int tracSpread(clientList* Clientlist, Packet* buf, Server* serv);
-int brodParser(Packet* buf, Client* client, Server* serv);
 int IdManager(tracList* traclist);
 
 

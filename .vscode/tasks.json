@@ -7,14 +7,15 @@
             "args": [
                 "-fdiagnostics-color=always",
                 "-g",
-                "${fileDirname}/../code/*",
+                "${workspaceRoot}/code/*.c",
+                "${workspaceRoot}/code/Server/*.c",
                 "-I",
-                "${fileDirname}/../headers/",
+                "${workspaceRoot}/headers/",
                 "-o",
-                "${fileDirname}/../a.out"
+                "${workspaceRoot}/a.out"
             ],
             "options": {
-                "cwd": "${fileDirname}"
+                "cwd": "${workspaceRoot}"
             },
             "problemMatcher": [
                 "$gcc"

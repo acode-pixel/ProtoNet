@@ -56,65 +56,6 @@ Server* Init(char* inter, char* ip, char* serverName, char Dir[]){
 	return serv;
 }
 
-int delClient(int fd, Server* serv){
-	for (int i = 0; i < MAX_CLIENTS; i++){
-		if (serv->Clientlist.clients[i].Socket == fd){
-			serv->Clientlist.clients[i].Socket = 0;
-			memset(serv->Clientlist.clients[i].name, 0, strlen(serv->Clientlist.clients[i].name));
-			serv->Clientlist.clients[i].socketMode = 0;
-			serv->nConn -= 1;
-			return 0;
-		}
-	} 
-	return -1;
-}
-
-int addClient(int fd, Server* serv){
-	struct kevent ev;
-
-	if (serv->nConn >= MAX_CLIENTS){
-		close(fd);
-		printf("Client MAX Reached\n");
-		return 0;
-	}
-
-
-	for(int i = 0; i <= MAX_CLIENTS; i++){
-		if (i > MAX_CLIENTS-1){
-			return -1;
-		}
-
-		else if (serv->Clientlist.clients[i].Socket == 0){
-			serv->Clientlist.clients[i].Socket = fd;
-			serv->nConn += 1;
-			serv->Clientlist.clients[i].socketMode = 0;
-			EV_SET(&ev, fd, EVFILT_READ, EV_ADD | EV_ENABLE | EV_CLEAR, 0, 0, NULL);
-			kevent(serv->kqueueInstance, &ev, 1, NULL, 0, NULL);
-			return 0;
-		}
-	}
-
-	return -1;
-}
-
-Client* getClient(clientList* Clientlist, int fd, char* name){
-	if (fd != 0){
-		for (int i = 0; i < MAX_CLIENTS; i++){
-			if (Clientlist->clients[i].Socket == fd){
-				return &Clientlist->clients[i];
-			}
-		}
-	} else if(name != NULL){
-		for (int i = 0; i < MAX_CLIENTS; i++){
-			if (strcmp(Clientlist->clients[i].name, name) == 0){
-				return &Clientlist->clients[i];
-			}
-		}
-	}
-
-	return (Client*)NULL;
-}
-
 int checkSockets(Server* serv, int fds[]){
 	struct timespec ts;
 	ts.tv_sec = 1;
@@ -182,64 +123,6 @@ int ServerListen(Server* serv){
 	}
 	return 0;
 
-}
-
-int addTracItem(tracList* Traclist, uint tracID, uint8_t hops, uint8_t lifetime, void* fileOffset, char* fileReq){
-	for (int i = 0; i < MAX_CLIENTS; i++){
-		if (Traclist->tracs[i].tracID != 0){
-			continue;
-		}
-
-		
-		Traclist->tracs[i].tracID = tracID;
-		Traclist->tracs[i].hops = hops;
-		Traclist->tracs[i].lifetime = lifetime;
-		Traclist->tracs[i].fileOffset = fileOffset;
-		strcpy(Traclist->tracs[i].fileReq, fileReq);
-		return 0;
-	}
-
-	printf("Maximum transactions reached\n");
-	return -1;
-}
-
-int tracSpread(clientList* Clientlist, Packet* buf, Server* serv){
-	struct TRAC* trac = (struct TRAC*) malloc(sizeof(struct TRAC));
-	trac->hops = ((struct BROD*)buf->data)->hops;
-	trac->lifetime = 255-trac->hops;
-	srand(time(NULL));
-	trac->tracID = rand();
-
-	for (int i = 0; i < MAX_CLIENTS; i++){
-		if (Clientlist->clients[i].Socket == 0){
-			continue;
-		}
-
-		sendPck(Clientlist->clients[i].Socket, serv->serverName, SPTP_TRAC, trac);
-
-	}
-
-	free(trac);
-	addTracItem(&serv->Traclist, trac->tracID, trac->hops, trac->lifetime, NULL, ((struct BROD*)buf->data)->fileReq);
-
-	return 0;
-}
-
-int brodParser(Packet* buf, Client* client, Server* serv){
-	char* fileReq = ((struct BROD*)buf->data)->fileReq;
-	char filepath[strlen(serv->dir)+strlen(fileReq)];
-	strcpy(filepath, serv->dir);
-	strcat(filepath, fileReq);
-
-	if(access(filepath, R_OK) == -1){
-		char* data = "NO_FILE";
-		sendPck(client->Socket, buf->Name, 1, data);
-		return 0;
-	} else {
-		client->socketMode = SPTP_BROD;
-		tracSpread(&serv->Clientlist, buf, serv);
-	}
-	return 0;
 }
 
 int IdManager(tracList* traclist){
