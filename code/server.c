@@ -124,20 +124,3 @@ int ServerListen(Server* serv){
 	return 0;
 
 }
-
-int IdManager(tracList* traclist){
-	printf("tracID|hops|lifetime|fileOffset|confirmed|File Request\n");
-	printf("========================================================================\n");
-
-	for (int i = 0; i < MAX_CLIENTS; i++){
-		if(traclist->tracs[i].tracID != 0){
-			printf("%i|", traclist->tracs[i].tracID);
-			printf("%i|", traclist->tracs[i].hops);
-			printf("%i|", traclist->tracs[i].lifetime);
-			printf("%p|", traclist->tracs[i].fileOffset);
-			printf("%x|", traclist->tracs[i].confirmed);
-			printf("%s\n", traclist->tracs[i].fileReq);
-		}
-	}
-	return 0;
-}

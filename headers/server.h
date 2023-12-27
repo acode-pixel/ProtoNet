@@ -51,7 +51,6 @@ Server* Init(char* inter, char* ip, char* serverName, char Dir[]);
 int checkSockets(Server* serv, int fds[]);
 int SocketManager(int fds[], Server* serv);
 int ServerListen(Server* serv);
-int IdManager(tracList* traclist);
 
 
 #endif
