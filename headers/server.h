@@ -51,7 +51,7 @@ int SocketManager(int fds[], Server* serv);
 int ServerListen(Server* serv);
 int tracSpread(clientList* Clientlist, Packet* buf, Server* serv);
 int brodParser(Packet* buf, Client* client, Server* serv);
-
+int IdManager(tracList* traclist);
 
 
 #endif

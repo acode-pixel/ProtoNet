@@ -50,7 +50,6 @@ int sendPck(int fd, char* Name, uint8_t Mode, void* data){
 }
 
 int readPck(int fd, Packet* buf){
-	printf("\nreading fd: %d", fd);
 
 	if (recv(fd, buf, sizeof(*buf), 0) == -1){
 		perror("read Failed:");

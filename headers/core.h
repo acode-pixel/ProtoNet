@@ -31,11 +31,12 @@ struct TRAC {
 };
 
 typedef struct tracItem {
-	uint tracID;
-	uint8_t hops;
-	uint8_t lifetime;
-	void* fileOffset;
-	char fileReq[];
+	uint tracID; 		// transaction ID
+	uint8_t hops; 		// hops between client and server from initial BROD packet
+	uint8_t lifetime; 	// calculated lifetime of packet from hops
+	void* fileOffset; 	// current file offset
+	uint8_t confirmed; 	// if transaction id is confirmed
+	char fileReq[255]; 	// file requested
 
 } tracItem;
 

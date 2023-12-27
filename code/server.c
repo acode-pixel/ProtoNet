@@ -63,7 +63,6 @@ int delClient(int fd, Server* serv){
 			memset(serv->Clientlist.clients[i].name, 0, strlen(serv->Clientlist.clients[i].name));
 			serv->Clientlist.clients[i].socketMode = 0;
 			serv->nConn -= 1;
-			printf("\nDeleted Client %i", fd);
 			return 0;
 		}
 	} 
@@ -75,7 +74,7 @@ int addClient(int fd, Server* serv){
 
 	if (serv->nConn >= MAX_CLIENTS){
 		close(fd);
-		printf("\nClient MAX Reached");
+		printf("Client MAX Reached\n");
 		return 0;
 	}
 
@@ -91,7 +90,6 @@ int addClient(int fd, Server* serv){
 			serv->Clientlist.clients[i].socketMode = 0;
 			EV_SET(&ev, fd, EVFILT_READ, EV_ADD | EV_ENABLE | EV_CLEAR, 0, 0, NULL);
 			kevent(serv->kqueueInstance, &ev, 1, NULL, 0, NULL);
-			printf("\nAdded %i to kqueue", fd);
 			return 0;
 		}
 	}
@@ -123,7 +121,6 @@ int checkSockets(Server* serv, int fds[]){
        	ts.tv_nsec = 5000000;
 	int nevents = kevent(serv->kqueueInstance, NULL, 0, serv->Events, 10, &ts);
 
-	printf("\n%i", nevents);
 	if (nevents == 0){
 		return 0;
 	}
@@ -156,7 +153,6 @@ int SocketManager(int fds[], Server* serv){
 		if (readPck(fds[i], buf) == 0){
 
 			if (buf->Mode == 1){
-				printf("\nParsing Packet");
 				brodParser(buf, getClient(&serv->Clientlist, fds[i], NULL), serv);
 			}
 
@@ -179,7 +175,6 @@ int ServerListen(Server* serv){
        	ts.tv_nsec = 0;
 
 	int nSockets = kevent(serv->lkqueueInstance, NULL, 0, &ev, 1, &ts);
-	printf("\nListening Events: %i", nSockets);
 
 	if (ev.filter == EVFILT_READ && ev.ident == serv->Socket){
 		int fd = accept(ev.ident, serv->ServerOpts.sockaddr, &serv->ServerOpts.socklen);	
@@ -195,6 +190,7 @@ int addTracItem(tracList* Traclist, uint tracID, uint8_t hops, uint8_t lifetime,
 			continue;
 		}
 
+		
 		Traclist->tracs[i].tracID = tracID;
 		Traclist->tracs[i].hops = hops;
 		Traclist->tracs[i].lifetime = lifetime;
@@ -203,7 +199,7 @@ int addTracItem(tracList* Traclist, uint tracID, uint8_t hops, uint8_t lifetime,
 		return 0;
 	}
 
-	printf("\nMaximum transactions reached");
+	printf("Maximum transactions reached\n");
 	return -1;
 }
 
@@ -234,7 +230,6 @@ int brodParser(Packet* buf, Client* client, Server* serv){
 	char filepath[strlen(serv->dir)+strlen(fileReq)];
 	strcpy(filepath, serv->dir);
 	strcat(filepath, fileReq);
-	printf("\nChecking file %s", filepath);
 
 	if(access(filepath, R_OK) == -1){
 		char* data = "NO_FILE";
@@ -243,6 +238,23 @@ int brodParser(Packet* buf, Client* client, Server* serv){
 	} else {
 		client->socketMode = SPTP_BROD;
 		tracSpread(&serv->Clientlist, buf, serv);
+	}
+	return 0;
+}
+
+int IdManager(tracList* traclist){
+	printf("tracID|hops|lifetime|fileOffset|confirmed|File Request\n");
+	printf("========================================================================\n");
+
+	for (int i = 0; i < MAX_CLIENTS; i++){
+		if(traclist->tracs[i].tracID != 0){
+			printf("%i|", traclist->tracs[i].tracID);
+			printf("%i|", traclist->tracs[i].hops);
+			printf("%i|", traclist->tracs[i].lifetime);
+			printf("%p|", traclist->tracs[i].fileOffset);
+			printf("%x|", traclist->tracs[i].confirmed);
+			printf("%s\n", traclist->tracs[i].fileReq);
+		}
 	}
 	return 0;
 }

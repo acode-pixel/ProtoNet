@@ -33,6 +33,10 @@ int connectToNetwork(char* IP, Client* cli){
 }
 
 int makeFileReq(int fd, char* Name, char File[]){
+	if(strlen(File) > 255){
+		printf("File name too long");
+		return -1;
+	}
 	struct BROD* br = (struct BROD*)malloc(sizeof(struct BROD) + strlen(File)+1);
 	br->hops = 0x01;
 	strcpy(br->fileReq, File);
