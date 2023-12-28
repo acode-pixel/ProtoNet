@@ -82,8 +82,29 @@ Server runtime loop:
 	use Socket manager to manage socket operations for each socket (if any)
 	print Sockets fds and their modes that are connected to the host
 
-Client runtime loop:
+Client runtime for client role:
 	send a BROD packet to server
+	wait for server response (resend if server doesn't respond within 32 iterations of the runtime)
+	loop:
+		if socket has no data to read
+			leave
+		read socket
+		if response is TRAC:
+			if client tracItem exists and respone hops are larger:
+				leave
+			move TRAC packet to client tracItem with confirmed bit;
+		if response BROD.NO_FILE with tracID:
+			send BROD.LEAVE packet with tracID
+			set tracItem's canDelete bit
+		if response is BROD.LEAVE_OK with tracID:
+			if tracItem's canDelete bit is set:
+				delete client tracItem
+				exit loop
+	close socket
+		
+
+
+
 
 Maximum file size for transfer is 1024 MB
 	

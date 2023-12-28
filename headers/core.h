@@ -14,6 +14,7 @@
 #include <errno.h>
 #include <assert.h>
 #include <unistd.h>
+#include <fcntl.h>
 
 #define SPTP_BROD 1
 #define SPTP_TRAC 2
@@ -38,10 +39,12 @@ struct TRAC {
 
 typedef struct tracItem {
 	uint tracID; 		// transaction ID
+	char fileRequester[12]; // Name of file requester
 	uint8_t hops; 		// hops between client and server from initial BROD packet
 	uint8_t lifetime; 	// calculated lifetime of packet from hops
 	void* fileOffset; 	// current file offset
 	uint8_t confirmed; 	// if transaction id is confirmed
+	uint8_t canDelete;	// if transaction can be deleted
 	char fileReq[255]; 	// file requested
 
 } tracItem;

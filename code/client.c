@@ -21,12 +21,12 @@ int connectToNetwork(char* IP, Client* cli){
 	sockaddr.sin_family = AF_INET;
 	sockaddr.sin_port = htons(C_PORT);
 	inet_aton(IP, &sockaddr.sin_addr);
-
-	//printf("%i %p %lu", tcpSocket, &sockaddr, sizeof(sockaddr));
 	
 	if (connect(tcpSocket, (struct sockaddr*)&sockaddr, sizeof(sockaddr)) == -1){
 		return -1;
 	}
+
+	fcntl(tcpSocket, F_SETFL, O_NONBLOCK, 1);
 	
 	return tcpSocket;
 

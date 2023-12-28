@@ -25,8 +25,8 @@ uint32_t getInterIP(int fd,char inter[]){
 
 int sendPck(int fd, char* Name, uint8_t Mode, void* data){
 	Packet* pck = NULL;
-	pck = (Packet*) malloc(sizeof(Packet) + strlen(data));
-	memset(pck, 0, sizeof(Packet) + strlen(data));
+	pck = (Packet*) malloc(sizeof(Packet) + strlen(data)+1);
+	memset(pck, 0, sizeof(Packet) + strlen(data)+1);
 	memcpy(pck->Proto, "SPTP", 4);
 	memcpy(pck->Name, Name, 12);
 	pck->Mode = Mode;
