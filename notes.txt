@@ -84,6 +84,8 @@ Server runtime loop:
 
 Client runtime loop:
 	send a BROD packet to server
+
+Maximum file size for transfer is 1024 MB
 	
 
 files:

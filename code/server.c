@@ -87,20 +87,19 @@ int SocketManager(int fds[], Server* serv){
 	for (int i = 0; i <= sizeof(*fds)/sizeof(fds[0]); i++){
 
 		if (fds[i] == 0){
+			memset(buf, 0, sizeof(Packet)+buf->datalen);
 			free(buf);
 			return 0;
 		}
 		
 		if (readPck(fds[i], buf) == 0){
 
-			if (buf->Mode == 1){
+			if (buf->Mode == SPTP_BROD){
 				brodParser(buf, getClient(&serv->Clientlist, fds[i], NULL), serv);
 			}
 
 		}
 
-		delClient(serv->Events[i].ident, serv);
-		close(serv->Events[i].ident);
 		fds[i] = 0;
 
 	}

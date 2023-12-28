@@ -24,6 +24,12 @@ struct BROD {
 	char fileReq[];
 };
 
+struct DATA {
+	uint8_t tracID;
+	uint32_t dataLen;
+	uint8_t data[1024];
+};
+
 struct TRAC {
 	uint tracID;
 	uint8_t hops;

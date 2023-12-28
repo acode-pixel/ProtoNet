@@ -15,14 +15,30 @@ int main(int argc, char* argv[]){
 	if (strcmp(argv[1], "client")==0){
 		Client* test1 = NULL;
 		test1 = Cl_Init(argv[2], argv[3]);
-		printf("Connecting to %s", argv[4]);
+
 		if (connectToNetwork(argv[4], test1) == -1){
 			perror("Failed to connect to client");
+			return 0;
 		}
 
 		makeFileReq(test1->Socket, test1->name, argv[5]);
-		close(test1->Socket);
-		free(test1);
+		printf("\nPress quit to quit");
+
+		while (true){
+			char* input;
+			scanf("%s", input);
+			if (strcmp(input, "leave") == 0){
+				char* data = "LEAVE";
+				sendPck(test1->Socket, test1->name, SPTP_BROD, data);
+				continue;
+			}
+
+			if (strcmp(input, "close") == 0){
+				close(test1->Socket);
+				free(test1);
+				break;
+			}
+		}
 
 		return 0;
 	}
