@@ -6,7 +6,7 @@ int brodParser(Packet* buf, Client* client, Server* serv){
     char* data;
 
     if (strcmp((char*)buf->data, "LEAVE") == 0){
-        data = "OK";
+        data = "LEAVE_OK";
         sendPck(client->Socket, serv->serverName, SPTP_BROD, data);
         printf("Deleting client");
         close(client->Socket);
@@ -22,7 +22,7 @@ int brodParser(Packet* buf, Client* client, Server* serv){
 
 	if(access(filepath, R_OK) == -1 || st.st_size > 1024000000){
 		data = "NO_FILE";
-		sendPck(client->Socket, buf->Name, 1, data);
+		sendPck(client->Socket, serv->serverName, SPTP_BROD, data);
 	} else {
 		client->socketMode = SPTP_BROD;
 		tracSpread(&serv->Clientlist, buf, serv);

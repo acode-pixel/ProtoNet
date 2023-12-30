@@ -65,3 +65,13 @@ int readPck(int fd, Packet* buf){
 
 	return 0;
 } 
+
+int fillTracItem(tracItem* trac, uint tracID, char* fileRequester, uint8_t hops, uint8_t lifetime, void* fileOffset, char* fileReq){
+	trac->tracID = tracID;
+	trac->hops = hops;
+	trac->lifetime = lifetime;
+	trac->fileOffset = fileOffset;
+	strcpy(trac->fileReq, fileReq);
+	strcpy(trac->fileRequester, fileRequester);
+	return 0;
+}

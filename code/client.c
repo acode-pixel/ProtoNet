@@ -3,6 +3,7 @@
 Client* Cl_Init(char* inter, char name[]){
 	Client* cli = (Client*) malloc(sizeof(Client));
 	cli->Socket = socket(AF_INET, SOCK_STREAM, 0);
+	cli->kqueueInstance = kqueue();
 	struct in_addr addr;
 	addr.s_addr = getInterIP(cli->Socket, inter);
 	if (name == NULL){
@@ -27,12 +28,15 @@ int connectToNetwork(char* IP, Client* cli){
 	}
 
 	fcntl(tcpSocket, F_SETFL, O_NONBLOCK, 1);
-	
+
+	struct kevent ev;
+	EV_SET(&ev, cli->Socket, EVFILT_READ, EV_ADD | EV_ENABLE, 0, 0, "CLIENT");
+	kevent(cli->kqueueInstance, &ev, 1, NULL, 0, NULL);
 	return tcpSocket;
 
 }
 
-int makeFileReq(int fd, char* Name, char File[]){
+int makeFileReq(Client* client, char File[]){
 	if(strlen(File) > 255){
 		printf("File name too long");
 		return -1;
@@ -40,8 +44,22 @@ int makeFileReq(int fd, char* Name, char File[]){
 	struct BROD* br = (struct BROD*)malloc(sizeof(struct BROD) + strlen(File)+1);
 	br->hops = 0x01;
 	strcpy(br->fileReq, File);
-	assert(sendPck(fd, Name, 1, br) == 0);
+	strcpy(client->fileReq, File);
+	assert(sendPck(client->Socket, client->name, 1, br) == 0);
+	fillTracItem(&client->trac, NULL, client->name, NULL, NULL, NULL, client->name);
 	free(br);
 	return 0;
 
 };
+
+bool clientCheckSocket(Client* client){
+	struct timespec ts;
+	ts.tv_sec = 1;
+    ts.tv_nsec = 0;
+
+	int nSockets = kevent(client->kqueueInstance, NULL, 0, NULL, 1, &ts);
+
+	if (nSockets == 0){
+		return false;
+	} else {return true;}
+}

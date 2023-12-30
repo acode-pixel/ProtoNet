@@ -21,24 +21,31 @@ int main(int argc, char* argv[]){
 			return 0;
 		}
 
-		makeFileReq(test1->Socket, test1->name, argv[5]);
-		printf("\nPress quit to quit");
+		makeFileReq(test1, argv[5]);
 
-		while (true){
-			char* input;
-			scanf("%s", input);
-			if (strcmp(input, "leave") == 0){
-				char* data = "LEAVE";
-				sendPck(test1->Socket, test1->name, SPTP_BROD, data);
+		Packet* buf = NULL;
+		buf = (Packet*) malloc(sizeof(Packet));
+
+		while (test1->trac.deleted == 0){
+
+			memset(buf, 0, sizeof(Packet)+buf->datalen);
+
+			if(clientCheckSocket(test1) == false){
 				continue;
 			}
 
-			if (strcmp(input, "close") == 0){
-				close(test1->Socket);
-				free(test1);
-				break;
+			readPck(test1->Socket, buf);
+
+			if (buf->Mode == SPTP_TRAC){
+				C_tracParser(buf, test1);
+			} else if(buf->Mode == SPTP_BROD){
+				C_brodParser(buf, test1);
 			}
+
 		}
+
+		close(test1->Socket);
+		free(buf);
 
 		return 0;
 	}

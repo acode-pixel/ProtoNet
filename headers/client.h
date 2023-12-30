@@ -8,10 +8,16 @@ typedef struct Client {
 	char name[12];
 	int Socket;
 	int socketMode;
+	int kqueueInstance;
+	tracItem trac;
+	char fileReq[255];
 } Client;
+
+#include "clientModules/parserModules.h"
 
 Client* Cl_Init(char* inter, char name[]);
 
 int connectToNetwork(char* IP, Client* cli);
-int makeFileReq(int fd, char* Name, char File[]);
+int makeFileReq(Client* client, char File[]);
+bool clientCheckSocket(Client* client);
 #endif

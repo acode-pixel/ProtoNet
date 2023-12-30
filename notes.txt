@@ -71,8 +71,10 @@ Socket Manager functions:
 			remove client from client list
 
 				
-		
-		
+
+Note:
+	make a side client function to see if a file is available
+	refine server loop for handling multiple packets in one fd	
 
 
 Server runtime loop:
@@ -101,7 +103,7 @@ Client runtime for client role:
 				delete client tracItem
 				exit loop
 	close socket
-		
+
 
 
 

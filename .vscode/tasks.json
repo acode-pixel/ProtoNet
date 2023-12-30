@@ -9,6 +9,7 @@
                 "-g",
                 "${workspaceRoot}/code/*.c",
                 "${workspaceRoot}/code/Server/*.c",
+                "${workspaceRoot}/code/Client/*.c",
                 "-I",
                 "${workspaceRoot}/headers/",
                 "-o",

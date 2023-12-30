@@ -4,10 +4,12 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>
+#include <stdbool.h>
 #include <string.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <sys/ioctl.h>
+#include <sys/event.h>
 #include <netinet/ip.h>
 #include <arpa/inet.h>
 #include <net/if.h>
@@ -26,8 +28,7 @@ struct BROD {
 };
 
 struct DATA {
-	uint8_t tracID;
-	uint32_t dataLen;
+	uint tracID;
 	uint8_t data[1024];
 };
 
@@ -39,6 +40,7 @@ struct TRAC {
 
 typedef struct tracItem {
 	uint tracID; 		// transaction ID
+	uint8_t deleted;	// transaction is deleted
 	char fileRequester[12]; // Name of file requester
 	uint8_t hops; 		// hops between client and server from initial BROD packet
 	uint8_t lifetime; 	// calculated lifetime of packet from hops
@@ -68,5 +70,6 @@ int setSockOpts(int sock, SocketOpt* so, char opts[]);
 uint32_t getInterIP(int fd,char inter[]);
 int sendPck(int fd, char *Name, uint8_t Mode, void* data);
 int readPck(int fd, Packet* buf);
+int fillTracItem(tracItem* trac, uint tracID, char* fileRequester, uint8_t hops, uint8_t lifetime, void* fileOffset, char* fileReq);
 
 #endif

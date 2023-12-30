@@ -8,7 +8,6 @@
 #include "client.h"
 #include <sys/ioctl.h>
 #include <net/if.h>
-#include <sys/event.h>
 #include <sys/time.h>
 
 typedef struct serverOpts {

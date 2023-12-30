@@ -71,6 +71,7 @@ int checkSockets(Server* serv, int fds[]){
 	for (int l = 0; l < MAX_EVENTS; l++){
 		if (serv->Events[l].filter == EVFILT_READ && serv->Events[l].flags != EV_EOF){
 		fds[index] = serv->Events[l].ident;
+		printf("fd: %lu, data: %li", serv->Events[l].ident, serv->Events[l].data);
 		index++;		
 		}
 	}
@@ -112,7 +113,7 @@ int ServerListen(Server* serv){
 	struct kevent ev;
 	struct timespec ts;
 	ts.tv_sec = 1;
-       	ts.tv_nsec = 0;
+    ts.tv_nsec = 0;
 
 	int nSockets = kevent(serv->lkqueueInstance, NULL, 0, &ev, 1, &ts);
 

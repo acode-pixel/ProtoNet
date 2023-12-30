@@ -1,5 +1,5 @@
-#ifndef CLIENT_MODULES_H
-#define CLIENT_MODULES_H
+#ifndef S_CLIENT_MODULES_H
+#define S_CLIENT_MODULES_H
 #include "server.h"
 
 int addClient(int fd, Server* serv);
