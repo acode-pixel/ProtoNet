@@ -32,7 +32,7 @@ int addClient(int fd, Server* serv){
 			serv->Clientlist.clients[i].Socket = fd;
 			serv->nConn += 1;
 			serv->Clientlist.clients[i].socketMode = 0;
-			EV_SET(&ev, fd, EVFILT_READ, EV_ADD | EV_ENABLE | EV_CLEAR, 0, 0, NULL);
+			EV_SET(&ev, fd, EVFILT_READ, EV_ADD | EV_ENABLE, 0, 0, NULL);
 			kevent(serv->kqueueInstance, &ev, 1, NULL, 0, NULL);
 			return 0;
 		}

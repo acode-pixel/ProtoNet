@@ -42,6 +42,7 @@ typedef struct tracItem {
 	uint tracID; 		// transaction ID
 	uint8_t deleted;	// transaction is deleted
 	char fileRequester[12]; // Name of file requester
+	uint Socket; // Socket to file requester
 	uint8_t hops; 		// hops between client and server from initial BROD packet
 	uint8_t lifetime; 	// calculated lifetime of packet from hops
 	void* fileOffset; 	// current file offset

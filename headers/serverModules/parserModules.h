@@ -4,5 +4,6 @@
 #include <sys/stat.h>
 
 int brodParser(Packet* buf, Client* client, Server* serv);
+int tracParser(Packet* buf, Client* client, Server* serv);
 
 #endif

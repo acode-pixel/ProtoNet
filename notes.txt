@@ -73,7 +73,7 @@ Socket Manager functions:
 				
 
 Note:
-	make a side client function to see if a file is available
+	make a side client function to see if a file is available on the network using BROD (make brodSpread)
 	refine server loop for handling multiple packets in one fd	
 
 

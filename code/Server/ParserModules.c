@@ -8,7 +8,6 @@ int brodParser(Packet* buf, Client* client, Server* serv){
     if (strcmp((char*)buf->data, "LEAVE") == 0){
         data = "LEAVE_OK";
         sendPck(client->Socket, serv->serverName, SPTP_BROD, data);
-        printf("Deleting client");
         close(client->Socket);
 		delClient(client->Socket, serv);
         return 0;
@@ -26,6 +25,15 @@ int brodParser(Packet* buf, Client* client, Server* serv){
 	} else {
 		client->socketMode = SPTP_BROD;
 		tracSpread(&serv->Clientlist, buf, serv);
+	}
+	return 0;
+}
+
+int tracParser(Packet* buf, Client* client, Server* serv){
+	if(strcmp((char*)((struct DATA*)buf->data)->data, "OK") == 0){
+		tracItem* trac = getTracItem(&serv->Traclist, buf->Name, 0);
+		trac->confirmed = 1;
+		trac->Socket = client->Socket;
 	}
 	return 0;
 }

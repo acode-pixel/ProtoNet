@@ -98,6 +98,9 @@ int SocketManager(int fds[], Server* serv){
 			if (buf->Mode == SPTP_BROD){
 				brodParser(buf, getClient(&serv->Clientlist, fds[i], NULL), serv);
 			}
+			else if (buf->Mode == SPTP_TRAC){
+				tracParser(buf, getClient(&serv->Clientlist, fds[i], NULL), serv);
+			}
 
 		}
 
