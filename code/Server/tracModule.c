@@ -36,20 +36,23 @@ int tracSpread(clientList* Clientlist, Packet* buf, Server* serv){
 	struct TRAC* trac = (struct TRAC*) malloc(sizeof(struct TRAC));
 	trac->hops = ((struct BROD*)buf->data)->hops;
 	trac->lifetime = 255-trac->hops;
-	srand(time(NULL));
-	trac->tracID = rand();
+	strcpy(trac->Name, buf->Name);
+	srand(time(NULL)+buf->datalen);
+	trac->tracID = (buf->Mode == SPTP_BROD) ? rand() : ((struct TRAC*)buf->data)->tracID;
+
 
 	for (int i = 0; i < MAX_CLIENTS; i++){
 		if (Clientlist->clients[i].Socket == 0){
 			continue;
 		}
 
+		trac->tracID *= Clientlist->clients[i].Socket^2;
 		sendPck(Clientlist->clients[i].Socket, serv->serverName, SPTP_TRAC, trac);
 
 	}
 
 	free(trac);
-	addTracItem(&serv->Traclist, trac->tracID, buf->Name, trac->hops, trac->lifetime, NULL, ((struct BROD*)buf->data)->fileReq);
+	addTracItem(&serv->Traclist, trac->tracID, trac->Name, trac->hops, trac->lifetime, NULL, ((struct BROD*)buf->data)->fileReq);
 
 	return 0;
 }
@@ -60,7 +63,7 @@ int IdManager(tracList* traclist){
 
 	for (int i = 0; i < MAX_CLIENTS; i++){
 		if(traclist->tracs[i].tracID != 0){
-			printf("%i|", traclist->tracs[i].tracID);
+			printf("%u|", traclist->tracs[i].tracID);
 			printf("%x|", traclist->tracs[i].deleted);
 			printf("%s|", traclist->tracs[i].fileRequester);
 			printf("%i|", traclist->tracs[i].Socket);

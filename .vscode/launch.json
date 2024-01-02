@@ -19,7 +19,21 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceRoot}/a.out",
-            "args": ["serv", "lo0", "", "test", "${workspaceRoot}/"],
+            "args": ["serv", "en0", "", "test", "${workspaceRoot}/"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceRoot}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "lldb",
+            "preLaunchTask": "C/C++: gcc build active file"
+        },
+
+        {
+            "name": "server/client test",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceRoot}/a.out",
+            "args": ["serv", "lo0", "192.168.18.14", "test2", "${workspaceRoot}/../"],
             "stopAtEntry": false,
             "cwd": "${workspaceRoot}",
             "environment": [],

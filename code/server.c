@@ -53,6 +53,10 @@ Server* Init(char* inter, char* ip, char* serverName, char Dir[]){
 	struct kevent ev;
 	EV_SET(&ev, serv->Socket, EVFILT_READ, EV_ADD | EV_ENABLE, 0, 0, "LISTEN");
 	kevent(serv->lkqueueInstance, &ev, 1, NULL, 0, NULL);
+	if(serv->client.Socket > 0){
+		EV_SET(&ev, serv->client.Socket, EVFILT_READ, EV_ADD | EV_ENABLE, 0, 0, NULL);
+		kevent(serv->kqueueInstance, &ev, 1, NULL, 0, NULL);
+	}
 	return serv;
 }
 
@@ -95,11 +99,19 @@ int SocketManager(int fds[], Server* serv){
 		
 		if (readPck(fds[i], buf) == 0){
 
-			if (buf->Mode == SPTP_BROD){
-				brodParser(buf, getClient(&serv->Clientlist, fds[i], NULL), serv);
+			if(fds[i] == serv->client.Socket){
+				if(buf->Mode == SPTP_TRAC){
+					tracParser(buf, &serv->client, serv);
+				}
 			}
-			else if (buf->Mode == SPTP_TRAC){
-				tracParser(buf, getClient(&serv->Clientlist, fds[i], NULL), serv);
+
+			else {
+				if (buf->Mode == SPTP_BROD){
+					brodParser(buf, getClient(&serv->Clientlist, fds[i], NULL), serv);
+				}
+				else if (buf->Mode == SPTP_TRAC){
+					tracParser(buf, getClient(&serv->Clientlist, fds[i], NULL), serv);
+				}
 			}
 
 		}

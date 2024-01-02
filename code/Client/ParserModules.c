@@ -1,7 +1,7 @@
 #include "clientModules/parserModules.h"
 
 int C_tracParser(Packet* buf, Client* client){
-    if(client->trac.tracID != 0){
+    if(client->trac.tracID != 0 && strcmp(buf->Name, client->name) != 0){
 	    return 0;
 	}
 				

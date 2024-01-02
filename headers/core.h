@@ -36,6 +36,7 @@ struct TRAC {
 	uint tracID;
 	uint8_t hops;
 	uint8_t lifetime;
+	char Name[12];
 };
 
 typedef struct tracItem {
