@@ -45,7 +45,7 @@ int makeFileReq(Client* client, char File[]){
 	br->hops = 0x01;
 	strcpy(br->fileReq, File);
 	strcpy(client->fileReq, File);
-	assert(sendPck(client->Socket, client->name, 1, br) == 0);
+	assert(sendPck(client->Socket, client->name, 1, br, 0) == 0);
 	fillTracItem(&client->trac, 0, client->name, 0, 0, NULL, client->name);
 	free(br);
 	return 0;

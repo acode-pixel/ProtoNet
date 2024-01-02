@@ -11,7 +11,7 @@ int C_tracParser(Packet* buf, Client* client){
     strcpy((char*)trac->data, "OK");
 
 	fillTracItem(&client->trac, trac->tracID, client->name, ((struct TRAC*)buf->data)->hops, ((struct TRAC*)buf->data)->lifetime, NULL, client->fileReq);
-	sendPck(client->Socket, client->name, SPTP_TRAC, trac);
+	sendPck(client->Socket, client->name, SPTP_TRAC, trac, 0);
 	free(trac);
     return 0;
 }
@@ -19,7 +19,7 @@ int C_tracParser(Packet* buf, Client* client){
 int C_brodParser(Packet* buf, Client* client){
     if(strcmp((char*)buf->data, "NO_FILE") == 0){
         char* data = "LEAVE";
-        sendPck(client->Socket, client->name, SPTP_BROD, data);
+        sendPck(client->Socket, client->name, SPTP_BROD, data, 0);
         client->trac.canDelete = 1;
         return 0;
     }

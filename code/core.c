@@ -23,23 +23,24 @@ uint32_t getInterIP(int fd,char inter[]){
 	return ((struct sockaddr_in*)&ifr.ifr_addr)->sin_addr.s_addr;
 }
 
-int sendPck(int fd, char* Name, uint8_t Mode, void* data){
+int sendPck(int fd, char* Name, uint8_t Mode, void* data, uint size){
 	Packet* pck = NULL;
-	pck = (Packet*) malloc(sizeof(Packet) + strlen(data)+1);
-	memset(pck, 0, sizeof(Packet) + strlen(data)+1);
+	uint pckSize =  (size == 0) ? strlen(data) : size;
+	pck = (Packet*) malloc(sizeof(Packet) + pckSize+1);
+	memset(pck, 0, sizeof(Packet) + pckSize+1);
 	memcpy(pck->Proto, "SPTP", 4);
 	memcpy(pck->Name, Name, 12);
 	pck->Mode = Mode;
-	if (strlen(data) > 1024){
+	if (pckSize > 1024){
 		errno = 84;
 		perror("Pck creation error");
 		free(pck);
 		return -1;
 	}
-	memcpy(pck->data, data, strlen(data));
-	pck->datalen = strlen(data)+1;
+	memcpy(pck->data, data, pckSize);
+	pck->datalen = pckSize+1;
 
-	if (send(fd, pck, sizeof(*pck) + strlen(data)+1, 0) == -1){
+	if (send(fd, pck, sizeof(*pck) + pckSize+1, 0) == -1){
 		perror("Falied to send Pck");
 		free(pck);
 		return -1;

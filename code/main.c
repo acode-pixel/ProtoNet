@@ -69,6 +69,7 @@ int main(int argc, char* argv[]){
 			system("clear");
 			checkSockets(test2, fds);
 			SocketManager(fds, test2);
+			DataManager(&test2->Traclist, test2);
 			IdManager(&test2->Traclist);
 		}
 		free(test2);

@@ -47,7 +47,7 @@ int tracSpread(clientList* Clientlist, Packet* buf, Server* serv){
 		}
 
 		trac->tracID *= Clientlist->clients[i].Socket^2;
-		sendPck(Clientlist->clients[i].Socket, serv->serverName, SPTP_TRAC, trac);
+		sendPck(Clientlist->clients[i].Socket, serv->serverName, SPTP_TRAC, trac, 0);
 
 	}
 
@@ -73,6 +73,13 @@ int IdManager(tracList* traclist){
 			printf("%x|", traclist->tracs[i].confirmed);
 			printf("%x|", traclist->tracs[i].canDelete);
 			printf("%s\n", traclist->tracs[i].fileReq);
+
+			if(traclist->tracs[i].confirmed == 0){
+				if(traclist->tracs[i].lifetime == 0){
+					fillTracItem(&traclist->tracs[i], 0, "", 0, 0, NULL, "");
+				}
+				else {traclist->tracs[i].lifetime -= 1;}
+			}
 		}
 	}
 	return 0;

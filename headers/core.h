@@ -29,7 +29,7 @@ struct BROD {
 
 struct DATA {
 	uint tracID;
-	uint8_t data[1024];
+	uint8_t data[1020];
 };
 
 struct TRAC {
@@ -44,6 +44,9 @@ typedef struct tracItem {
 	uint8_t deleted;	// transaction is deleted
 	char fileRequester[12]; // Name of file requester
 	uint Socket; // Socket to file requester
+	uint socketStatus; // status of socket 
+	uint fd; // fd to requested file (if trac is confirmed)
+	uint fileSize; // size of file requested
 	uint8_t hops; 		// hops between client and server from initial BROD packet
 	uint8_t lifetime; 	// calculated lifetime of packet from hops
 	void* fileOffset; 	// current file offset
@@ -70,7 +73,7 @@ typedef struct SocketOpt {
 
 int setSockOpts(int sock, SocketOpt* so, char opts[]);
 uint32_t getInterIP(int fd,char inter[]);
-int sendPck(int fd, char *Name, uint8_t Mode, void* data);
+int sendPck(int fd, char *Name, uint8_t Mode, void* data, uint size);
 int readPck(int fd, Packet* buf);
 int fillTracItem(tracItem* trac, uint tracID, char* fileRequester, uint8_t hops, uint8_t lifetime, void* fileOffset, char* fileReq);
 

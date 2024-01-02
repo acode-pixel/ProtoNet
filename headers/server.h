@@ -9,6 +9,7 @@
 #include <sys/ioctl.h>
 #include <net/if.h>
 #include <sys/time.h>
+#include <fcntl.h>
 
 typedef struct serverOpts {
 	SocketOpt socketOpt;
@@ -44,12 +45,12 @@ typedef struct Server {
 #include "serverModules/clientModule.h"
 #include "serverModules/parserModules.h"
 #include "serverModules/tracModule.h"
+#include "serverModules/dataModule.h"
 #include "clientModules/parserModules.h"
 
 Server* Init(char* inter, char* ip, char* serverName, char Dir[]);
 int checkSockets(Server* serv, int fds[]);
 int SocketManager(int fds[], Server* serv);
 int ServerListen(Server* serv);
-
 
 #endif
